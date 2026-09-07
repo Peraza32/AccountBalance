@@ -1,0 +1,102 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Visual Studio
+.vs/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+# ASP.NET Core / .NET
+appsettings.Local.json
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# User-specific configuration
+launchSettings.json
+
+# Logs
+*.log
+logs/
+Logs/
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Code coverage
+coverage/
+.coverage/
+*.opencover.xml
+
+# Publish output
+publish/
+Publish/
+*.publishsettings
+
+# Azure
+*.azurePubxml
+*.publishproj
+
+# Client-side dependencies
+node_modules/
+
+# Frontend build output
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Certificates / keys
+*.pfx
+*.p12
+*.pem
+*.key
+*.cer
+
+# Docker
+docker-compose.override.yml
+
+# Generated files
+Generated/
+generated/
