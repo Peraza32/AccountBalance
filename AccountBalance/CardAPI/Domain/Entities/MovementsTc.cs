@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CardAPI.Models
+namespace CardAPI.Domain.Models
 {
-    public partial class PaymentsTc
+    public partial class MovementsTc
     {
         public int Id { get; set; }
         public DateTime MvDate { get; set; }

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using CardAPI.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace CardAPI.Models
+namespace CardAPI.Infrastructure.Persistance
 {
     public partial class BD_TARJETAContext : DbContext
     {

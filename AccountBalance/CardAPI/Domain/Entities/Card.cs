@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CardAPI.Models
+namespace CardAPI.Domain.Models
 {
     public partial class Card
     {
