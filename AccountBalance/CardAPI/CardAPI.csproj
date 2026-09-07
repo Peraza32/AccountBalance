@@ -26,10 +26,8 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="Domain\Entities\DTO\" />
     <Folder Include="Application\" />
-    <Folder Include="Infrastructure\Repositories\" />
-    <Folder Include="Utils\Validators\" />
+    <Folder Include="Domain\Entities\DAO\" />
   </ItemGroup>
 
 </Project>
