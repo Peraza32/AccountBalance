@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using CardAPI.Domain.Entities.DTO;
 using CardAPI.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace CardAPI.Infrastructure.Persistance
 {
-    public partial class BD_TARJETAContext : DbContext
+    public partial class CardDbContext : DbContext
     {
-        public BD_TARJETAContext()
+        public CardDbContext()
         {
         }
 
-        public BD_TARJETAContext(DbContextOptions<BD_TARJETAContext> options)
+        public CardDbContext(DbContextOptions<CardDbContext> options)
             : base(options)
         {
         }
@@ -25,14 +26,7 @@ namespace CardAPI.Infrastructure.Persistance
         public virtual DbSet<PaymentsTc> PaymentsTcs { get; set; }
         public virtual DbSet<TransactionState> TransactionStates { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=VICTOR32\\SQLEXPRESS;Database=BD_TARJETA;User Id=project;Password=Majoras89;TrustServerCertificate=True;");
-            }
-        }
+        public DbSet<UserWithCardsDTO> UserWithCardsDTO { get; set; } // For the Stored Procedure result mapping
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -241,6 +235,24 @@ namespace CardAPI.Infrastructure.Persistance
                     .HasMaxLength(50)
                     .HasColumnName("TSTATE");
             });
+
+            // Registering DTO for Stored procedure: GET_CLIENTWITHCARDS 
+
+            modelBuilder.Entity<UserWithCardsDTO>()
+                .HasNoKey()
+                .ToView(null); // This indicates that this entity is not mapped to a table or view
+
+            modelBuilder.Entity<UserWithCardsDTO>()
+                .Property(e => e.clientId) 
+                .HasColumnName("DOC_NUMBER");
+
+            modelBuilder.Entity<UserWithCardsDTO>()
+                .Property(e => e.clientName)
+                .HasColumnName("CLIENT_NAME");
+
+            modelBuilder.Entity<UserWithCardsDTO>()
+                .Property(e => e.cardNumber)
+                .HasColumnName("CARD_NUMBER");
 
             OnModelCreatingPartial(modelBuilder);
         }
