@@ -5,7 +5,7 @@ namespace CardAPI.Utils.Validators
 {
     public class PurchaseValidator:AbstractValidator<PurchaseDTO>
     {
-        PurchaseValidator() { 
+        public PurchaseValidator() { 
         
             RuleFor(purchase => purchase.cardId).NotEqual(Guid.Empty).WithMessage("Card ID is required.");
             RuleFor(purchase => purchase.purchaseDate).NotEmpty().WithMessage("Purchase date is required.");

@@ -10,6 +10,7 @@ namespace CardAPI.Utils.Validators
             RuleFor(payment => payment.cardId).NotEqual(Guid.Empty).WithMessage("Card ID is required.");
             RuleFor(payment => payment.paymentDate).NotEmpty().WithMessage("Payment date is required.");
             RuleFor(payment => payment.amount).GreaterThan(0).WithMessage("Payment amount must be greater than zero.");
+            RuleFor(payment => payment.description).NotEmpty().WithMessage("Payment description is required.");
         }
     }
 }
