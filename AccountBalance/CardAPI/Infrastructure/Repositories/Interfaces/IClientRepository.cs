@@ -1,8 +1,10 @@
-﻿namespace CardAPI.Infrastructure.Repositories.Interfaces
+﻿using CardAPI.Domain.Entities.DTO;
+
+namespace CardAPI.Infrastructure.Repositories.Interfaces
 {
     public interface IClientRepository
     {
-        public Task<object> GetUserAndCards(string user);
-        public Task<object> GetUserPurchases(int userId, int cardId);
+        public Task<List<UserWithCardsDTO>> GetUserAndCards(string user);
+        public Task<List<PurchaseDTO>> GetUserPurchases(int userId, Guid cardId);
     }
 }
