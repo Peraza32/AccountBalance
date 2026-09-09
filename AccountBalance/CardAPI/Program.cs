@@ -1,6 +1,7 @@
 using CardAPI.Infrastructure.Persistance;
 using CardAPI.Infrastructure.Repositories;
 using CardAPI.Infrastructure.Repositories.Interfaces;
+using CardAPI.Utils.Profiles;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,12 @@ builder.Services.AddDbContext<CardDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SQLConnection")));
 
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<ICardRepository, CardRepository>();
+builder.Services.AddScoped<ILogsRepository, LogsRepository>();
+
+//Automapper 
+builder.Services.AddAutoMapper(typeof(PurchaseProfile));
+builder.Services.AddAutoMapper(typeof(PaymentProfile));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

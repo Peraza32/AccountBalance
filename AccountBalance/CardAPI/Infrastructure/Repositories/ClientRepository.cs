@@ -36,7 +36,6 @@ namespace CardAPI.Infrastructure.Repositories
                     purchaseDate = m.MvDate,
                     description = m.MvDescription,
                     price = m.Amount,
-                    state = m.IdState
                 })
                 .ToListAsync();
             return purchases;
