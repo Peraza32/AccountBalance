@@ -27,7 +27,7 @@ namespace CardAPI.Infrastructure.Persistance
         public virtual DbSet<TransactionState> TransactionStates { get; set; }
 
         public DbSet<UserWithCardsDTO> UserWithCardsDTO { get; set; } // For the Stored Procedure result mapping
-
+        public DbSet<NewPurchaseResultDTO> PurchaseResults { get; set; } // PROCESS_PURCHASE
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Card>(entity =>
@@ -255,6 +255,11 @@ namespace CardAPI.Infrastructure.Persistance
                 .HasColumnName("CARD_NUMBER");
 
             OnModelCreatingPartial(modelBuilder);
+
+            //STORED PROCEDURE: PROCESS_PURCHASE
+            modelBuilder.Entity<NewPurchaseResultDTO>()
+                .HasNoKey()
+                .ToView(null);
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
