@@ -7,6 +7,11 @@
         public string description { get; set; }
         public  decimal price { get; set; }
 
-        public int state { get; set; } = 1;
+    }
+
+    public class NewPurchaseResultDTO
+    {
+        public int purchaseId { get; set; }
+        public int Status { get; set; }
     }
 }
