@@ -2,6 +2,6 @@
 {
     public interface ILogsRepository
     {
-        public Task<object> InsertLogAsync(string origin, string description, DateTime logDate);
+        public Task InsertLogAsync(string origin, string description, DateTime logDate);
     }
 }

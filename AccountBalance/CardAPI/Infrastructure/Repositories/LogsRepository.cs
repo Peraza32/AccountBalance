@@ -14,7 +14,7 @@ namespace CardAPI.Infrastructure.Repositories
             _context = context;
         }
 
-        public async  Task InsertLogAsync(string origin, string description, DateTime logDate)
+        public async Task InsertLogAsync(string origin, string description, DateTime logDate)
         {
             var log = new Log
             {
