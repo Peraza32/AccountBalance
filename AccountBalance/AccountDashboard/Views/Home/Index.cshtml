@@ -1,0 +1,31 @@
+﻿@model CardLookupViewModel
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="page-header">
+    <h1>Consultar estado de cuenta</h1>
+    <span class="subtitle">Ingresa el identificador de la tarjeta para continuar</span>
+</div>
+
+<div class="card" style="max-width: 480px;">
+
+    <form asp-controller="Home" asp-action="Index" method="post" novalidate>
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+        <div class="form-group">
+            <label asp-for="CardId"></label>
+            <input asp-for="CardId" class="form-control" placeholder="00000000-0000-0000-0000-000000000000" />
+            <span asp-validation-for="CardId" class="field-error"></span>
+            <div class="field-hint">Es el identificador (GUID) de la tarjeta en CARDS.ID.</div>
+        </div>
+
+        <div class="btn-row">
+            <button type="submit" class="btn btn-primary">Ver estado de cuenta</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
