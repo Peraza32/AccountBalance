@@ -1,0 +1,51 @@
+﻿@model AccountStatementViewModel
+@{
+    ViewData["Title"] = "Estado de cuenta - Imprimir";
+    ViewData["CardId"] = Model.CardId;
+    Layout = "_Layout";
+}
+
+<div class="btn-row no-print">
+    <button type="button" class="btn btn-primary js-print-statement">Imprimir / Guardar como PDF</button>
+</div>
+
+<div class="card">
+    <div class="holder-strip">
+        <div>
+            <div class="holder-name">@Model.CardHolderName</div>
+            <div class="card-number">Tarjeta terminada en @Model.CardNumber</div>
+        </div>
+        <div class="text-muted">@DateTime.Today.ToString("dd/MM/yyyy")</div>
+    </div>
+
+    <table class="data-table">
+        <tbody>
+            <tr><td>Saldo total</td><td class="amount money">@Model.CurrentBalance.ToString("C")</td></tr>
+            <tr><td>Límite de crédito</td><td class="amount money">@Model.CreditLimit.ToString("C")</td></tr>
+            <tr><td>Saldo disponible</td><td class="amount money">@Model.AvailableCredit.ToString("C")</td></tr>
+            <tr><td>Total compras mes actual</td><td class="amount money">@Model.TotalCurrentMonthPurchases.ToString("C")</td></tr>
+            <tr><td>Total compras mes anterior</td><td class="amount money">@Model.TotalPreviousMonthPurchases.ToString("C")</td></tr>
+            <tr><td>Interés bonificable</td><td class="amount money">@Model.BonifiableInterest.ToString("C")</td></tr>
+            <tr><td>Cuota mínima a pagar</td><td class="amount money">@Model.MinimumPayment.ToString("C")</td></tr>
+            <tr><td>Monto total a pagar</td><td class="amount money">@Model.TotalAmountDue.ToString("C")</td></tr>
+            <tr><td>Pago de contado con intereses</td><td class="amount money">@Model.CashPaymentWithInterest.ToString("C")</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h2>Compras del mes</h2>
+    <table class="data-table">
+        <thead><tr><th>Fecha</th><th>Descripción</th><th class="amount">Monto</th></tr></thead>
+        <tbody>
+            @foreach (var purchase in Model.MonthPurchases)
+            {
+                <tr>
+                    <td>@purchase.Date.ToString("dd/MM/yyyy")</td>
+                    <td>@purchase.Description</td>
+                    <td class="amount money">@purchase.Amount.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
