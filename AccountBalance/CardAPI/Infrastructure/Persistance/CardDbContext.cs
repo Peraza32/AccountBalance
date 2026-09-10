@@ -28,6 +28,8 @@ namespace CardAPI.Infrastructure.Persistance
 
         public DbSet<UserWithCardsDTO> UserWithCardsDTO { get; set; } // For the Stored Procedure result mapping
         public DbSet<NewPurchaseResultDTO> PurchaseResults { get; set; } // PROCESS_PURCHASE
+        public DbSet<AccountBalanceDTO> AccountBalances { get; set; } // GET_ACCOUNT_BALANCE
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Card>(entity =>
@@ -260,6 +262,12 @@ namespace CardAPI.Infrastructure.Persistance
             modelBuilder.Entity<NewPurchaseResultDTO>()
                 .HasNoKey()
                 .ToView(null);
+
+            //STORED PROCEDURE: GET_ACCOUNT_BALANCE
+            modelBuilder.Entity<AccountBalanceDTO>()
+                .HasNoKey()
+                .ToView(null);
+ 
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CardAPI.Application.Client.Queries.AccountBalance;
+using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CardAPI.Controllers
@@ -7,12 +9,23 @@ namespace CardAPI.Controllers
     [ApiController]
     public class ClientController : ControllerBase
     {
+        private readonly IMediator _mediator;
+
+        public ClientController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
 
         //GET api/<CardController>/Balance
         [HttpGet("Balance")]
-        public async Task<IActionResult> GetBalance()
+        public async Task<IActionResult> GetBalance([FromBody] GetAccountBalance query)
         {
-            return Ok();
+            var result = await _mediator.Send(query);
+            if(result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
 

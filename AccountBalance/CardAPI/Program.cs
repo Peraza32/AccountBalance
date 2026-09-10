@@ -15,6 +15,7 @@ builder.Services.AddDbContext<CardDbContext>(options =>
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<ICardRepository, CardRepository>();
 builder.Services.AddScoped<ILogsRepository, LogsRepository>();
+builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 
 //Automapper 
 builder.Services.AddAutoMapper(typeof(PurchaseProfile));

@@ -16,6 +16,11 @@ namespace CardAPI.Infrastructure.Repositories
             _logsRepository = logsRepository;
         }
 
+        /// <summary>
+        /// Gets the purchases for the current month for a specific card.
+        /// </summary>
+        /// <param name="cardId"></param>
+        /// <returns></returns>
         public async Task<List<PurchaseDTO>> GetPurchasesCurrentMonthAsync(string cardId)
         {
             try 
