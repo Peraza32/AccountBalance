@@ -26,9 +26,9 @@ namespace CardAPI.Infrastructure.Persistance
         public virtual DbSet<PaymentsTc> PaymentsTcs { get; set; }
         public virtual DbSet<TransactionState> TransactionStates { get; set; }
 
-        public DbSet<UserWithCardsDTO> UserWithCardsDTO { get; set; } // For the Stored Procedure result mapping
+        public DbSet<UserWithCardsDTO> UserWithCards { get; set; } // For the Stored Procedure result mapping
         public DbSet<NewPurchaseResultDTO> PurchaseResults { get; set; } // PROCESS_PURCHASE
-        public DbSet<AccountBalanceDTO> AccountBalances { get; set; } // GET_ACCOUNT_BALANCE
+        public DbSet<AccountBalanceResponseDTO> AccountBalances { get; set; } // GET_ACCOUNT_BALANCE
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -256,7 +256,11 @@ namespace CardAPI.Infrastructure.Persistance
                 .Property(e => e.cardNumber)
                 .HasColumnName("CARD_NUMBER");
 
-            OnModelCreatingPartial(modelBuilder);
+            modelBuilder.Entity<UserWithCardsDTO>()
+                .Property(e => e.idCard)
+                .HasColumnName("CARD_ID");
+
+            
 
             //STORED PROCEDURE: PROCESS_PURCHASE
             modelBuilder.Entity<NewPurchaseResultDTO>()
@@ -264,10 +268,52 @@ namespace CardAPI.Infrastructure.Persistance
                 .ToView(null);
 
             //STORED PROCEDURE: GET_ACCOUNT_BALANCE
-            modelBuilder.Entity<AccountBalanceDTO>()
-                .HasNoKey()
-                .ToView(null);
- 
+            modelBuilder.Entity<AccountBalanceResponseDTO>()
+     .HasNoKey()
+     .ToView(null);
+
+            modelBuilder.Entity<AccountBalanceResponseDTO>()
+                .Property(e => e.cardHolderName)
+                .HasColumnName("CARD_HOLDER");
+
+            modelBuilder.Entity<AccountBalanceResponseDTO>()
+                .Property(e => e.cardNumber)
+                .HasColumnName("CARD_NUMBER");
+
+            modelBuilder.Entity<AccountBalanceResponseDTO>()
+                .Property(e => e.currentCredit)
+                .HasColumnName("TOTAL_CREDIT");
+
+            modelBuilder.Entity<AccountBalanceResponseDTO>()
+                .Property(e => e.availableCredit)
+                .HasColumnName("AVAILABLE_CREDIT");
+
+            modelBuilder.Entity<AccountBalanceResponseDTO>()
+                .Property(e => e.creditLimit)
+                .HasColumnName("CREDIT_LIMIT");
+
+            modelBuilder.Entity<AccountBalanceResponseDTO>()
+                .Property(e => e.totalActualMonthPurchases)
+                .HasColumnName("TOTAL_PURCHASES_CURRENT_MONTH");
+
+            modelBuilder.Entity<AccountBalanceResponseDTO>()
+                .Property(e => e.previousMonthPurchases)
+                .HasColumnName("TOTAL_PURCHASES_PREVIOUS_MONTH");
+
+            modelBuilder.Entity<AccountBalanceResponseDTO>()
+                .Property(e => e.bonificationInterest)
+                .HasColumnName("BONIFI_INTEREST");
+
+            modelBuilder.Entity<AccountBalanceResponseDTO>()
+                .Property(e => e.minimumPayment)
+                .HasColumnName("MIN_PAYMENT");
+
+            modelBuilder.Entity<AccountBalanceResponseDTO>()
+                .Property(e => e.totalWithInterest)
+                .HasColumnName("TOTAL_WITH_INTEREST");
+
+            OnModelCreatingPartial(modelBuilder);
+
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

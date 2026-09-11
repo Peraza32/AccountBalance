@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CardAPI.Domain.Entities.DTO
 {
-    public class AccountBalanceDTO 
+    public class AccountBalanceResponseDTO 
     {
         public string cardHolderName { get; set; }
         public string cardNumber { get; set; }
@@ -19,6 +19,7 @@ namespace CardAPI.Domain.Entities.DTO
 
         public decimal bonificationInterest { get; set; }
 
-        public decimal minimumPayment { get; set; } 
+        public decimal minimumPayment { get; set; }
+        public decimal totalWithInterest { get; set; }
     }
 }
