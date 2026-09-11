@@ -1,0 +1,180 @@
+{
+  "info": {
+    "_postman_id": "a3e215e0-a144-4c95-a0c2-441cfac42090",
+    "name": "AccountDashboard",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58133605",
+    "_collection_link": "https://go.postman.co/collection/58133605-a3e215e0-a144-4c95-a0c2-441cfac42090?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "GetBalance",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \r\n    \"cardId\": \"83b0e16a-8630-4704-99a6-b52d13ae222d\",\r\n    \"userId\": \"00000001\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:7161/api/Client/Balance",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7161",
+          "path": [
+            "api",
+            "Client",
+            "Balance"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "AllTransaction",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \r\n    \"cardId\": \"83b0e16a-8630-4704-99a6-b52d13ae222d\",\r\n    \"userId\": \"00000001\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:7161/api/Client/TransactionHistory",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7161",
+          "path": [
+            "api",
+            "Client",
+            "TransactionHistory"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetCliente",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7161/api/Client/00000001",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7161",
+          "path": [
+            "api",
+            "Client",
+            "00000001"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GeneratePDF",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7161/api/AccountStatement/83b0e16a-8630-4704-99a6-b52d13ae222d/pdf?userId=00000001",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7161",
+          "path": [
+            "api",
+            "AccountStatement",
+            "83b0e16a-8630-4704-99a6-b52d13ae222d",
+            "pdf"
+          ],
+          "query": [
+            {
+              "key": "userId",
+              "value": "00000001"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PostPayment",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"cardId\": \"83b0e16a-8630-4704-99a6-b52d13ae222d\",\r\n  \"paymentDate\": \"2026-09-10\",\r\n  \"description\": \"monthly payment for coffee\",\r\n  \"amount\": 10.99\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:7161/api/Card/payment",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7161",
+          "path": [
+            "api",
+            "Card",
+            "payment"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PostPurchase",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"cardId\": \"83b0e16a-8630-4704-99a6-b52d13ae222d\",\r\n  \"purchaseDate\": \"2026-09-10\",\r\n  \"description\": \"string\",\r\n  \"price\": 10.99\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:7161/api/Card/purchase",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7161",
+          "path": [
+            "api",
+            "Card",
+            "purchase"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

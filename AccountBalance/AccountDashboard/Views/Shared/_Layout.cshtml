@@ -1,0 +1,61 @@
+@using AccountDashboard.Web.Common
+@{
+    var selectedCard = Context.Session.GetSelectedCard();
+    string currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+
+    string NavClass(string controllerName) => currentController.Equals(controllerName, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Tarjeta de Crédito</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-inner">
+            <a asp-controller="Home" asp-action="Index" class="navbar-brand">
+                <span class="brand-mark">TC</span>
+                <span> Tarjeta de Crédito</span>
+            </a>
+
+            <nav class="navbar-links">
+                <a asp-controller="AccountStatement" asp-action="Index" class="@NavClass("AccountStatement")">Estado de Cuenta</a>
+                <a asp-controller="Purchase" asp-action="Create" class="@NavClass("Purchase")">Compras</a>
+                <a asp-controller="Payment" asp-action="Create" class="@NavClass("Payment")">Pagos</a>
+                <a asp-controller="TransactionHistory" asp-action="Index" class="@NavClass("TransactionHistory")">Historial</a>
+                <a asp-controller="Client" asp-action="Create" class="@NavClass("Client")">Nuevo Cliente</a>
+            </nav>
+
+            <div class="navbar-context">
+                @if (selectedCard is not null)
+                {
+                    <span class="context-card">@selectedCard.ClientName &middot; @selectedCard.CardNumberMasked</span>
+                    <a asp-controller="Home" asp-action="ChangeClient">Cambiar</a>
+                }
+                else
+                {
+                    <a asp-controller="Home" asp-action="Index">Buscar cliente</a>
+                }
+            </div>
+        </div>
+    </header>
+
+    <main class="page-container">
+        @await Html.PartialAsync("_Notifications")
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer">
+        Prueba Técnica 
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

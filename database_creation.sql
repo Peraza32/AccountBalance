@@ -1,3 +1,6 @@
+CREATE DATABASE BD_TARJETA;
+GO
+
 USE BD_TARJETA;
 GO
 
@@ -33,6 +36,12 @@ CREATE TABLE CLIENT(
 	CONSTRAINT FK_CLIENT_DOCTYPE FOREIGN KEY (ID_DOCTYPE) REFERENCES DOCTYPE(ID)
 );
 
+CREATE TABLE CARD_STATUS(
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    STATUS_NAME NVARCHAR(20) NOT NULL
+);
+
+
 
 
 CREATE TABLE CARDS(
@@ -41,14 +50,16 @@ CREATE TABLE CARDS(
 	ID_CLIENT NVARCHAR(20) NOT NULL,
 	CARD_NUMBER NVARCHAR(20) NOT NULL,
 	LASTD_CARD VARCHAR(4) NOT NULL,
+	ID_CARD_STATUS INT NOT NULL DEFAULT 1,
 	CREDIT_LIMIT DECIMAL(18,2) NOT NULL,
 	AV_CREDIT DECIMAL(18,2) NOT NULL,
 	TOTAL_CREDIT DECIMAL(18,2) NOT NULL,
 	INTEREST DECIMAL(18,2) DEFAULT 9.0,
 	MIN_INTEREST DECIMAL(18,2) DEFAULT 5.0,
 	CREATION_DATE DATETIME2 DEFAULT GETDATE(),
-	CREATION_USER VARCHAR(100) DEFAULT 'SYSTEM'
-	CONSTRAINT FK_ID_CLIENTE_CC FOREIGN KEY (ID_CLIENT) REFERENCES CLIENT(DOC_NUMBER)
+	CREATION_USER VARCHAR(100) DEFAULT 'SYSTEM',
+	CONSTRAINT FK_ID_CLIENTE_CC FOREIGN KEY (ID_CLIENT) REFERENCES CLIENT(DOC_NUMBER),
+	CONSTRAINT FK_CARDS_STATUS FOREIGN KEY (ID_CARD_STATUS) REFERENCES CARD_STATUS(ID)
 
 )
 
@@ -79,42 +90,293 @@ CREATE TABLE PAYMENTS_TC(
 
 );
 
+
+
 --STORED PROCEDURES
 --INSERT NEW CREDIT CARD
-CREATE PROCEDURE GET_ACCOUNTBALANCE
+CREATE PROCEDURE GET_CLIENTWITHCARDS
 (
-	@CARD_NUMBER NVARCHAR(20) ,
-	@ID_TARJETA UNIQUEIDENTIFIER 
+	@CLIENT NVARCHAR(20)
 )
 AS
 BEGIN
 	SET NOCOUNT ON
-	DECLARE @INTEREST_BON DECIMAL(18,2);
-	
 	BEGIN TRY
 
-		IF NOT EXISTS (
-            SELECT 1 FROM CARDS 
-            WHERE (@ID_TARJETA IS NULL OR ID = @ID_TARJETA)
-              AND (@CARD_NUMBER IS NULL OR LASTD_CARD = @CARD_NUMBER)
-        )
-        BEGIN
-            THROW 50001, 'Card not found', 1;
-        END
-
-		SELECT 
-			TOTAL_CREDIT, AV_CREDIT, CREDIT_LIMIT,
-			(TOTAL_CREDIT * (INTEREST/100)) AS INTERES_BONIFICABLE,
-			(TOTAL_CREDIT * (MIN_INTEREST/100)) AS MIN_PAYMENT,
-			TOTAL_CREDIT AS TOTAL_AMOUNT_TO_PAY,
-			(TOTAL_CREDIT + (TOTAL_CREDIT * (INTEREST/100))) AS TOTAL_AMOUNT_WITH_INTEREST
-		FROM CARDS
-		WHERE ID = @ID_TARJETA AND LASTD_CARD = @CARD_NUMBER;
+		SELECT CL.DOC_NUMBER, CL.CLIENT_NAME, CD.LASTD_CARD AS CARD_NUMBER, CD.ID AS CARD_ID  FROM CLIENT AS CL
+		INNER JOIN CARDS AS CD
+		ON CL.DOC_NUMBER = CD.ID_CLIENT
+		WHERE DOC_NUMBER = @CLIENT;
 
 	END TRY
 	BEGIN CATCH
+		THROW
+	END CATCH
+END
+
+CREATE PROCEDURE GET_CLIENTWITHCARDSBYNAME
+(
+	@CLIENT_NAME NVARCHAR(20)
+)
+AS
+BEGIN
+	SET NOCOUNT ON
+	BEGIN TRY
+
+		SELECT CL.DOC_NUMBER, CL.CLIENT_NAME, CD.LASTD_CARD AS CARD_NUMBER, CD.ID AS CARD_ID  FROM CLIENT AS CL
+		INNER JOIN CARDS AS CD
+		ON CL.DOC_NUMBER = CD.ID_CLIENT
+		WHERE CLIENT_NAME = @CLIENT_NAME;
+
+	END TRY
+	BEGIN CATCH
+		THROW
+	END CATCH
+END
+
+
+CREATE PROCEDURE GET_ACCOUNT_BALANCE
+(
+    @ID_TARJETA UNIQUEIDENTIFIER,
+	@ID_CLIENTE VARCHAR(20)
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        DECLARE @ProcessedStateId INT = (SELECT ID FROM TRANSACTION_STATE WHERE TSTATE = 'Finished');
+
+        IF NOT EXISTS (SELECT 1 FROM CARDS WHERE ID = @ID_TARJETA AND ID_CLIENT = @ID_CLIENTE)
+        BEGIN
+            THROW 50001, 'Tarjeta no encontrada.', 1;
+        END
+
+        DECLARE @CurrentMonthTotal DECIMAL(18,2) = ISNULL((
+            SELECT SUM(AMOUNT)
+            FROM MOVEMENTS_TC
+            WHERE ID_CARD = @ID_TARJETA
+              AND ID_STATE = @ProcessedStateId
+              AND YEAR(MV_DATE) = YEAR(GETDATE())
+              AND MONTH(MV_DATE) = MONTH(GETDATE())
+        ), 0);
+
+        DECLARE @PreviousMonthTotal DECIMAL(18,2) = ISNULL((
+            SELECT SUM(AMOUNT)
+            FROM MOVEMENTS_TC
+            WHERE ID_CARD = @ID_TARJETA
+              AND ID_STATE = @ProcessedStateId
+              AND YEAR(MV_DATE) = YEAR(DATEADD(MONTH, -1, GETDATE()))
+              AND MONTH(MV_DATE) = MONTH(DATEADD(MONTH, -1, GETDATE()))
+        ), 0);
+
+        SELECT
+            CL.CLIENT_NAME AS CARD_HOLDER,
+            C.LASTD_CARD AS CARD_NUMBER,
+            C.TOTAL_CREDIT,
+            C.CREDIT_LIMIT ,
+            C.AV_CREDIT AS AVAILABLE_CREDIT,
+            (C.TOTAL_CREDIT * (C.INTEREST / 100)) AS BONIFI_INTEREST,
+            (C.TOTAL_CREDIT * (C.MIN_INTEREST / 100)) AS MIN_PAYMENT,
+            C.TOTAL_CREDIT AS TOTAL_TO_PAY,
+            (C.TOTAL_CREDIT + (C.TOTAL_CREDIT * (C.INTEREST / 100))) AS TOTAL_WITH_INTEREST,
+            @CurrentMonthTotal AS TOTAL_PURCHASES_CURRENT_MONTH,
+            @PreviousMonthTotal AS TOTAL_PURCHASES_PREVIOUS_MONTH
+        FROM CARDS C
+        INNER JOIN CLIENT CL ON CL.DOC_NUMBER = C.ID_CLIENT
+        WHERE C.ID = @ID_TARJETA;
+
+    END TRY
+    BEGIN CATCH
         THROW;
     END CATCH
 END
 GO
 
+CREATE PROCEDURE PROCESS_PURCHASE
+(
+    @ID_TARJETA UNIQUEIDENTIFIER,
+    @MONTO DECIMAL(18,2),
+    @DESCRIPCION NVARCHAR(200),
+    @FECHA DATETIME,
+	@PurchaseId INT OUTPUT,
+	@Status INT OUTPUT
+)
+AS
+BEGIN
+     SET NOCOUNT ON;
+    DECLARE @RowsAffected INT;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        UPDATE CARDS
+        SET AV_CREDIT = AV_CREDIT - @MONTO,
+            TOTAL_CREDIT = TOTAL_CREDIT + @MONTO
+        WHERE ID = @ID_TARJETA
+          AND ID_CARD_STATUS = 1
+          AND AV_CREDIT >= @MONTO;
+
+        SET @RowsAffected = @@ROWCOUNT;
+
+        SET @Status = CASE WHEN @RowsAffected = 0 THEN 4 ELSE 3 END;
+
+        INSERT INTO MOVEMENTS_TC (ID_CARD, MV_DATE, AMOUNT, MV_DESCRIPTION, ID_STATE)
+        VALUES (@ID_TARJETA, @FECHA, @MONTO, @DESCRIPCION, @Status);
+
+        SET @PurchaseId = SCOPE_IDENTITY();
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END
+GO
+
+CREATE PROCEDURE PROCESS_PAYMENT
+(
+    @ID_TARJETA UNIQUEIDENTIFIER,
+    @MONTO DECIMAL(18,2),
+    @DESCRIPCION NVARCHAR(300),
+    @FECHA DATETIME2,
+    @PaymentId INT OUTPUT
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @ProcessedStateId INT = (SELECT ID FROM TRANSACTION_STATE WHERE TSTATE = 'Finished');
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        IF NOT EXISTS (
+            SELECT 1 FROM CARDS WITH (UPDLOCK, ROWLOCK)
+            WHERE ID = @ID_TARJETA AND ID_CARD_STATUS = 1
+        )
+        BEGIN
+            THROW 50001, 'Tarjeta no encontrada o inactiva.', 1;
+        END
+
+        IF @MONTO > (SELECT TOTAL_CREDIT FROM CARDS WHERE ID = @ID_TARJETA)
+        BEGIN
+            THROW 50002, 'El monto excede el saldo adeudado.', 1;
+        END
+
+        UPDATE CARDS
+        SET TOTAL_CREDIT = TOTAL_CREDIT - @MONTO,
+            AV_CREDIT = AV_CREDIT + @MONTO
+        WHERE ID = @ID_TARJETA;
+
+        INSERT INTO PAYMENTS_TC (ID_CARD, MV_DATE, AMOUNT, MV_DESCRIPTION, ID_STATE)
+        VALUES (@ID_TARJETA, @FECHA, @MONTO, @DESCRIPCION, @ProcessedStateId);
+
+        SET @PaymentId = SCOPE_IDENTITY();
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END
+GO
+
+
+--INSERTS
+INSERT INTO TRANSACTION_STATE
+VALUES 
+	('Pending'),
+	('In Progress'),
+	('Finished'),
+	('Failed');
+
+
+SELECT * FROM TRANSACTION_STATE;
+SELECT * FROM DOCTYPE;
+
+INSERT INTO DOCTYPE
+VALUES 
+	('DUI'),
+	('NIT')
+
+INSERT INTO CARD_STATUS
+VALUES
+	('ACTIVE'),
+	('DEACTIVATED')
+
+
+-- =========================================
+-- CLIENTES
+-- =========================================
+INSERT INTO CLIENT (DOC_NUMBER, CLIENT_NAME, CELLPHONE, EMAIL, ID_DOCTYPE)
+VALUES
+    ('06121234567', 'Maria Fernanda Lopez',  '70112233', 'maria.lopez@mail.com', 1),
+    ('06129876543', 'Carlos Alberto Reyes',  '70223344', 'carlos.reyes@mail.com', 1),
+    ('06135551212', 'Ana Patricia Gomez',    '70334455', 'ana.gomez@mail.com',   1),
+    ('J061098765',  'Comercial Atlantida SA','22334455', 'contacto@comercial.com', 2);
+GO
+
+-- =========================================
+-- TARJETAS
+-- Nota: TOTAL_CREDIT = crédito ya utilizado (deuda actual)
+--       AV_CREDIT = CREDIT_LIMIT - TOTAL_CREDIT
+-- Se declaran variables para poder referenciar los GUIDs generados
+-- en los movimientos/pagos posteriores.
+-- =========================================
+DECLARE @Card1 UNIQUEIDENTIFIER = NEWID(); -- Maria - saldo con uso moderado
+DECLARE @Card2 UNIQUEIDENTIFIER = NEWID(); -- Carlos - saldo alto, casi al límite
+DECLARE @Card3 UNIQUEIDENTIFIER = NEWID(); -- Ana - tarjeta nueva, sin uso
+DECLARE @Card4 UNIQUEIDENTIFIER = NEWID(); -- Comercial - tarjeta desactivada
+
+INSERT INTO CARDS (ID, ID_CLIENT, CARD_NUMBER, LASTD_CARD, ID_CARD_STATUS, CREDIT_LIMIT, AV_CREDIT, TOTAL_CREDIT, INTEREST, MIN_INTEREST)
+VALUES
+    (@Card1, '06121234567', '4000123456781234', '1234', 1, 2000.00, 1885.53, 114.47, 25.0, 5.0),
+    (@Card2, '06129876543', '4000123456785678', '5678', 1, 1500.00, 120.00, 1380.00, 20.0, 4.0),
+    (@Card3, '06135551212', '4000123456789012', '9012', 1, 3000.00, 3000.00, 0.00, 22.5, 5.0),
+    (@Card4, 'J061098765',  '4000123456780000', '0000', 2, 5000.00, 5000.00, 0.00, 18.0, 5.0);
+
+-- =========================================
+-- MOVIMIENTOS (COMPRAS) - MOVEMENTS_TC
+-- ID_STATE: 3 = Finished (procesada), 4 = Failed (rechazada)
+-- Incluye compras del mes actual y del mes anterior para
+-- poder validar el cálculo de "total compras mes actual vs anterior"
+-- =========================================
+
+-- Compras de @Card1 (Maria) - mes actual
+INSERT INTO MOVEMENTS_TC (MV_DATE, ID_CARD, AMOUNT, MV_DESCRIPTION, ID_STATE)
+VALUES
+    (DATEADD(DAY, -2, GETDATE()), @Card1, 45.99, 'Supermercado La Colonia', 3),
+    (DATEADD(DAY, -5, GETDATE()), @Card1, 68.48, 'Farmacia San Nicolas',     3),
+    (DATEADD(DAY, -1, GETDATE()), @Card1, 15.00, 'Suscripcion streaming',    3);
+
+-- Compras de @Card1 (Maria) - mes anterior
+INSERT INTO MOVEMENTS_TC (MV_DATE, ID_CARD, AMOUNT, MV_DESCRIPTION, ID_STATE)
+VALUES
+    (DATEADD(MONTH, -1, DATEADD(DAY, -3, GETDATE())), @Card1, 120.35, 'Compra ropa Simán', 3),
+    (DATEADD(MONTH, -1, DATEADD(DAY, -10, GETDATE())), @Card1, 34.10, 'Restaurante',       3);
+
+-- Compras de @Card2 (Carlos) - mes actual, incluye una rechazada por exceder disponible
+INSERT INTO MOVEMENTS_TC (MV_DATE, ID_CARD, AMOUNT, MV_DESCRIPTION, ID_STATE)
+VALUES
+    (DATEADD(DAY, -4, GETDATE()), @Card2, 300.00, 'Electrodomésticos',        3),
+    (DATEADD(DAY, -1, GETDATE()), @Card2, 500.00, 'Intento de compra rechazada', 4);
+
+-- Compras de @Card2 (Carlos) - mes anterior
+INSERT INTO MOVEMENTS_TC (MV_DATE, ID_CARD, AMOUNT, MV_DESCRIPTION, ID_STATE)
+VALUES
+    (DATEADD(MONTH, -1, DATEADD(DAY, -6, GETDATE())), @Card2, 250.00, 'Reparación vehículo', 3);
+
+-- @Card3 (Ana) no tiene movimientos - tarjeta nueva sin historial
+
+-- =========================================
+-- PAGOS - PAYMENTS_TC
+-- ID_STATE: 3 = Finished
+-- =========================================
+INSERT INTO PAYMENTS_TC (MV_DATE, ID_CARD, AMOUNT, MV_DESCRIPTION, ID_STATE)
+VALUES
+    (DATEADD(DAY, -7, GETDATE()), @Card1, 100.00, 'Pago mensual', 3),
+    (DATEADD(MONTH, -1, DATEADD(DAY, -15, GETDATE())), @Card2, 200.00, 'Pago parcial', 3);
+
+GO

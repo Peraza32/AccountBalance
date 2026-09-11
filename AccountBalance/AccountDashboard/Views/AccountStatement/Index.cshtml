@@ -1,0 +1,123 @@
+@model AccountStatementViewModel
+@inject IConfiguration Configuration
+    
+@{
+    ViewData["Title"] = "Estado de Cuenta";
+}
+
+<div class="page-header">
+    <h1>Estado de Cuenta</h1>
+    <p>@Model.CardHolderName &middot; Tarjeta @Model.CardNumberMasked</p>
+</div>
+
+@await Html.PartialAsync("_ModelErrors")
+
+<div class="card">  
+    <h2 class="card-title">Resumen de saldo</h2>
+    <div class="card-grid">
+        <div class="stat-tile emphasis">
+            <div class="stat-label">Saldo actual (utilizado)</div>
+            <div class="stat-value">@Model.CurrentCredit.ToString("C2")</div>
+        </div>
+        <div class="stat-tile">
+            <div class="stat-label">Límite de crédito</div>
+            <div class="stat-value">@Model.CreditLimit.ToString("C2")</div>
+        </div>
+        <div class="stat-tile">
+            <div class="stat-label">Saldo disponible</div>
+            <div class="stat-value">@Model.AvailableCredit.ToString("C2")</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2 class="card-title">Compras del mes</h2>
+    <div class="card-grid" style="margin-bottom:18px;">
+        <div class="stat-tile">
+            <div class="stat-label">Total mes actual</div>
+            <div class="stat-value">@Model.TotalActualMonthPurchases.ToString("C2")</div>
+        </div>
+        <div class="stat-tile">
+            <div class="stat-label">Total mes anterior</div>
+            <div class="stat-value">@Model.PreviousMonthPurchases.ToString("C2")</div>
+        </div>
+    </div>
+
+    @if (Model.Purchases.Count == 0)
+    {
+        <div class="empty-state">No hay compras registradas este mes.</div>
+    }
+    else
+    {
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Descripción</th>
+                        <th style="text-align:right;">Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var purchase in Model.Purchases)
+                    {
+                        <tr>
+                            <td>@purchase.PurchaseDate.ToString("dd/MM/yyyy")</td>
+                            <td>@purchase.Description</td>
+                            <td style="text-align:right;" class="money">@purchase.Price.ToString("C2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="card">
+    <h2 class="card-title">Pagos y cargos calculados</h2>
+    <div class="card-grid">
+        <div class="stat-tile">
+            <div class="stat-label">Interés bonificable</div>
+            <div class="stat-value">@Model.BonificationInterest.ToString("C2")</div>
+        </div>
+        <div class="stat-tile">
+            <div class="stat-label">Cuota mínima a pagar</div>
+            <div class="stat-value">@Model.MinimumPayment.ToString("C2")</div>
+        </div>
+        <div class="stat-tile emphasis">
+            <div class="stat-label">Monto total a pagar</div>
+            <div class="stat-value">@Model.TotalToPay.ToString("C2")</div>
+        </div>
+        <div class="stat-tile emphasis">
+            <div class="stat-label">Total de contado con intereses</div>
+            <div class="stat-value">@Model.TotalWithInterest.ToString("C2")</div>
+        </div>
+    </div>
+
+    <div class="btn-row">
+        <a href="@(Configuration["ApiSettings:BaseUrl"]
+                   + "api/AccountStatement/"
+                              + Model.CardHolderName
+                   + "/pdf")" class="btn btn-secondary">
+            Exportar PDF
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <h2 class="card-title">Acciones rápidas</h2>
+    <div class="action-grid">
+        <a asp-controller="Purchase" asp-action="Create" class="action-card">
+            <div class="action-title">Registrar compra</div>
+            <div class="action-desc">Agregar una nueva compra a la tarjeta.</div>
+        </a>
+        <a asp-controller="Payment" asp-action="Create" class="action-card">
+            <div class="action-title">Registrar pago</div>
+            <div class="action-desc">Aplicar un pago al saldo de la tarjeta.</div>
+        </a>
+        <a asp-controller="TransactionHistory" asp-action="Index" class="action-card">
+            <div class="action-title">Ver historial</div>
+            <div class="action-desc">Compras y pagos del mes, ordenados por fecha.</div>
+        </a>
+    </div>
+</div>

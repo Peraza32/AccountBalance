@@ -1,0 +1,61 @@
+@model CreateClientViewModel
+@{
+    ViewData["Title"] = "Nuevo cliente";
+}
+
+<div class="page-header">
+    <h1>Registrar nuevo cliente</h1>
+    <p>Alta de cliente para emisión de tarjeta de crédito.</p>
+</div>
+
+<div class="placeholder-note">
+    <strong>IN PROGRESS</strong> 
+</div>
+
+@await Html.PartialAsync("_ModelErrors")
+
+<div class="card" style="max-width: 560px;">
+    <h2 class="card-title">Datos del cliente</h2>
+
+    <form asp-controller="Client" asp-action="Create" method="post" novalidate>
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <label asp-for="DocNumber"></label>
+            <input asp-for="DocNumber" class="form-control" placeholder="Ej. 04512345-6" />
+            <span asp-validation-for="DocNumber" class="field-validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DocType"></label>
+            <select asp-for="DocType" class="form-control">
+                <option value="DUI">DUI</option>
+                <option value="NIT">NIT</option>
+            </select>
+            <span asp-validation-for="DocType" class="field-validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ClientName"></label>
+            <input asp-for="ClientName" class="form-control" placeholder="Nombre completo" />
+            <span asp-validation-for="ClientName" class="field-validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Cellphone"></label>
+            <input asp-for="Cellphone" class="form-control" placeholder="Ej. 7000-0000" />
+            <span asp-validation-for="Cellphone" class="field-validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" class="form-control" placeholder="correo@ejemplo.com" />
+            <span asp-validation-for="Email" class="field-validation-error"></span>
+        </div>
+
+        <div class="btn-row">
+            <button type="submit" class="btn btn-primary">Guardar cliente</button>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>

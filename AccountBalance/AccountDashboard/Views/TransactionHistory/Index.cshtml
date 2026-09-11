@@ -1,0 +1,56 @@
+@model TransactionHistoryViewModel
+@{
+    ViewData["Title"] = "Historial de transacciones";
+}
+
+<div class="page-header">
+    <h1>Historial de transacciones del mes</h1>
+    <p>Tarjeta @Model.CardNumberMasked &middot; Compras y pagos ordenados por fecha descendente.</p>
+</div>
+
+@await Html.PartialAsync("_ModelErrors")
+
+<div class="card">
+    <h2 class="card-title">Movimientos</h2>
+
+    @if (Model.Transactions.Count == 0)
+    {
+        <div class="empty-state">No hay transacciones registradas este mes.</div>
+    }
+    else
+    {
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th style="text-align:right;">Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var tx in Model.Transactions)
+                    {
+                        var isPurchase = tx.Type?.Equals("Purchase", StringComparison.OrdinalIgnoreCase) == true
+                                          || tx.Type?.Equals("Compra", StringComparison.OrdinalIgnoreCase) == true;
+                        <tr>
+                            <td>@tx.Date.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <span class="badge @(isPurchase ? "badge-purchase" : "badge-payment")">
+                                    @(isPurchase ? "Compra" : "Pago")
+                                </span>
+                            </td>
+                            <td>@tx.Description</td>
+                            <td><span class="badge badge-neutral">@tx.StateLabel</span></td>
+                            <td style="text-align:right;" class="money @(isPurchase ? "negative" : "positive")">
+                                @(isPurchase ? "-" : "+")@tx.Amount.ToString("C2")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
