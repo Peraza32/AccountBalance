@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Readme.md" />
+  </Folder>
   <Project Path="AccountDashboard/AccountDashboard.csproj" />
   <Project Path="CardAPI/CardAPI.csproj" />
 </Solution>

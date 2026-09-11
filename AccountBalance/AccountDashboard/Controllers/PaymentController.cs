@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AccountDashboard.Web.Controllers
 {
-    /
+    
     public class PaymentController : Controller
     {
         private readonly ICardApiService _cardApiService;
