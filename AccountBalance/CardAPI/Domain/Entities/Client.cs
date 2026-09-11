@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CardAPI.Domain.Entities;
+using System;
 using System.Collections.Generic;
 
 namespace CardAPI.Domain.Models
