@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CardAPI.Domain.Models
+namespace CardAPI.Domain.Entities
 {
     public partial class Card
     {
-        public Card()
-        {
-            MovementsTcs = new HashSet<MovementsTc>();
-            PaymentsTcs = new HashSet<PaymentsTc>();
-        }
-
         public Guid Id { get; set; }
         public string IdClient { get; set; }
         public string CardNumber { get; set; }
         public string LastdCard { get; set; }
+        public int IdCardStatus { get; set; }
         public decimal CreditLimit { get; set; }
         public decimal AvCredit { get; set; }
         public decimal TotalCredit { get; set; }
@@ -23,8 +18,6 @@ namespace CardAPI.Domain.Models
         public DateTime? CreationDate { get; set; }
         public string CreationUser { get; set; }
 
-        public virtual Client IdClientNavigation { get; set; }
-        public virtual ICollection<MovementsTc> MovementsTcs { get; set; }
-        public virtual ICollection<PaymentsTc> PaymentsTcs { get; set; }
+        public virtual CardStatus IdCardStatusNavigation { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CardAPI.Domain.Entities;
 using CardAPI.Domain.Entities.DTO;
 using CardAPI.Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -84,11 +85,7 @@ namespace CardAPI.Infrastructure.Persistance
                     .HasColumnType("decimal(18, 2)")
                     .HasColumnName("TOTAL_CREDIT");
 
-                entity.HasOne(d => d.IdClientNavigation)
-                    .WithMany(p => p.Cards)
-                    .HasForeignKey(d => d.IdClient)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_ID_CLIENTE_CC");
+                
             });
 
             modelBuilder.Entity<Client>(entity =>
@@ -180,11 +177,7 @@ namespace CardAPI.Infrastructure.Persistance
                     .HasMaxLength(300)
                     .HasColumnName("MV_DESCRIPTION");
 
-                entity.HasOne(d => d.IdCardNavigation)
-                    .WithMany(p => p.MovementsTcs)
-                    .HasForeignKey(d => d.IdCard)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_ID_CARD_MV");
+                
 
                 entity.HasOne(d => d.IdStateNavigation)
                     .WithMany(p => p.MovementsTcs)
@@ -213,11 +206,7 @@ namespace CardAPI.Infrastructure.Persistance
                     .HasMaxLength(300)
                     .HasColumnName("MV_DESCRIPTION");
 
-                entity.HasOne(d => d.IdCardNavigation)
-                    .WithMany(p => p.PaymentsTcs)
-                    .HasForeignKey(d => d.IdCard)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_ID_CARD_PY");
+                
 
                 entity.HasOne(d => d.IdStateNavigation)
                     .WithMany(p => p.PaymentsTcs)
