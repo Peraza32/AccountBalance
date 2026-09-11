@@ -1,0 +1,38 @@
+@model SelectCardViewModel
+@{
+    ViewData["Title"] = "Seleccionar tarjeta";
+}
+
+<div class="page-header">
+    <h1>Seleccionar tarjeta</h1>
+    <p>@Model.ClientName tiene más de una tarjeta registrada. Elija con cuál desea continuar.</p>
+</div>
+
+<div class="card" style="max-width: 480px;">
+    <h2 class="card-title">Tarjetas disponibles</h2>
+
+    <form asp-controller="Home" asp-action="SelectCard" method="post" novalidate>
+        @Html.AntiForgeryToken()
+        @await Html.PartialAsync("_ModelErrors")
+
+        <input type="hidden" asp-for="UserId" />
+        <input type="hidden" asp-for="ClientName" />
+
+        <div class="form-group">
+            <label asp-for="SelectedCardId">Tarjeta</label>
+            <select asp-for="SelectedCardId" class="form-control">
+                <option value="">-- Seleccione una tarjeta --</option>
+                @foreach (var card in Model.Cards)
+                {
+                    <option value="@card.CardId">@card.CardNumberMasked</option>
+                }
+            </select>
+            <span asp-validation-for="SelectedCardId" class="field-validation-error"></span>
+        </div>
+
+        <div class="btn-row">
+            <button type="submit" class="btn btn-primary">Continuar</button>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>

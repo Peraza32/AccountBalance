@@ -1,32 +1,29 @@
-﻿
-@model CardLookupViewModel
+@model ClientSearchViewModel
 @{
-    ViewData["Title"] = "Inicio";
+    ViewData["Title"] = "Buscar cliente";
 }
 
 <div class="page-header">
-    <h1>Consultar estado de cuenta</h1>
-    <span class="subtitle">Ingresa el número del documento del cliente para continuar</span>
+    <h1>Estado de cuenta de tarjeta de crédito</h1>
+    <p>Ingrese el número de documento del cliente para consultar sus tarjetas.</p>
 </div>
 
 <div class="card" style="max-width: 480px;">
+    <h2 class="card-title">Buscar cliente</h2>
 
     <form asp-controller="Home" asp-action="Index" method="post" novalidate>
-        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        @Html.AntiForgeryToken()
+        @await Html.PartialAsync("_ModelErrors")
 
         <div class="form-group">
-            <label asp-for="docNumber"></label>
-            <input asp-for="docNumber" class="form-control" placeholder="123456789" />
-            <span asp-validation-for="docNumber" class="field-error"></span>
-            <div class="field-hint">Ingrese un DUI o NIT.</div>
+            <label asp-for="UserId"></label>
+            <input asp-for="UserId" class="form-control" placeholder="Ej. 04512345-6" autofocus />
+            <span asp-validation-for="UserId" class="field-validation-error"></span>
+            <div class="form-hint">Corresponde al DOC_NUMBER registrado en el banco (DUI/NIT).</div>
         </div>
 
         <div class="btn-row">
-            <button type="submit" class="btn btn-primary">Ver estado de cuenta</button>
+            <button type="submit" class="btn btn-primary">Buscar</button>
         </div>
     </form>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

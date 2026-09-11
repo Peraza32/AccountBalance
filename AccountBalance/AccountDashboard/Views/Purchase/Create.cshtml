@@ -1,46 +1,42 @@
-﻿@model NewPurchaseViewModel
+@model PurchaseFormViewModel
 @{
-    ViewData["Title"] = "Nueva compra";
-    ViewData["CardId"] = Model.CardId;
+    ViewData["Title"] = "Registrar compra";
 }
 
 <div class="page-header">
     <h1>Registrar compra</h1>
+    <p>Tarjeta @Model.CardNumberMasked</p>
 </div>
 
 <div class="card" style="max-width: 520px;">
-    <form asp-controller="Purchase" asp-action="Create" method="post"
-          class="ajax-form" data-redirect-url="@Url.Action("Index", "AccountStatement", new { cardId = Model.CardId })"
-          novalidate>
-        <input type="hidden" asp-for="CardId" />
-        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
-        <div class="form-feedback"></div>
+    <h2 class="card-title">Datos de la compra</h2>
+
+    <form asp-controller="Purchase" asp-action="Create" method="post" data-confirm="¿Confirma registrar esta compra?" novalidate>
+        @Html.AntiForgeryToken()
+        @await Html.PartialAsync("_ModelErrors")
+        <input type="hidden" asp-for="CardNumberMasked" />
 
         <div class="form-group">
             <label asp-for="PurchaseDate"></label>
-            <input asp-for="PurchaseDate" class="form-control" />
-            <span asp-validation-for="PurchaseDate" class="field-error"></span>
+            <input asp-for="PurchaseDate" class="form-control" type="date" />
+            <span asp-validation-for="PurchaseDate" class="field-validation-error"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="Description"></label>
             <input asp-for="Description" class="form-control" placeholder="Ej. Supermercado, restaurante, compra en línea" />
-            <span asp-validation-for="Description" class="field-error"></span>
+            <span asp-validation-for="Description" class="field-validation-error"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="Price"></label>
-            <input asp-for="Price" class="form-control" step="0.01" min="0.01" />
-            <span asp-validation-for="Price" class="field-error"></span>
+            <input asp-for="Price" class="form-control" type="number" step="0.01" min="0.01" placeholder="0.00" />
+            <span asp-validation-for="Price" class="field-validation-error"></span>
         </div>
 
         <div class="btn-row">
             <button type="submit" class="btn btn-primary">Registrar compra</button>
-            <a class="btn btn-secondary" asp-controller="AccountStatement" asp-action="Index" asp-route-cardId="@Model.CardId">Cancelar</a>
+            <a asp-controller="AccountStatement" asp-action="Index" class="btn btn-secondary">Cancelar</a>
         </div>
     </form>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
