@@ -1,11 +1,7 @@
 ﻿$(function () {
     "use strict";
 
-    // ------------------------------------------------------------------
-    // Generic AJAX form submit for the Purchase / Payment "create" forms.
-    // Falls back to a normal browser POST automatically if JS is off,
-    // because the form's plain action/method attributes still work.
-    // ------------------------------------------------------------------
+    
     $(".ajax-form").on("submit", function (e) {
         e.preventDefault();
 
@@ -57,11 +53,7 @@
         });
     });
 
-    // ------------------------------------------------------------------
-    // "Exportar en PDF": no backend PDF endpoint exists yet, so this opens
-    // the browser's native print dialog against the print-optimized view
-    // (see AccountStatementController.Print + Views/AccountStatement/Print.cshtml).
-    // ------------------------------------------------------------------
+
     $(".js-print-statement").on("click", function () {
         window.print();
     });
