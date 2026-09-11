@@ -305,3 +305,78 @@ INSERT INTO CARD_STATUS
 VALUES
 	('ACTIVE'),
 	('DEACTIVATED')
+
+
+-- =========================================
+-- CLIENTES
+-- =========================================
+INSERT INTO CLIENT (DOC_NUMBER, CLIENT_NAME, CELLPHONE, EMAIL, ID_DOCTYPE)
+VALUES
+    ('06121234567', 'Maria Fernanda Lopez',  '70112233', 'maria.lopez@mail.com', 1),
+    ('06129876543', 'Carlos Alberto Reyes',  '70223344', 'carlos.reyes@mail.com', 1),
+    ('06135551212', 'Ana Patricia Gomez',    '70334455', 'ana.gomez@mail.com',   1),
+    ('J061098765',  'Comercial Atlantida SA','22334455', 'contacto@comercial.com', 2);
+GO
+
+-- =========================================
+-- TARJETAS
+-- Nota: TOTAL_CREDIT = crédito ya utilizado (deuda actual)
+--       AV_CREDIT = CREDIT_LIMIT - TOTAL_CREDIT
+-- Se declaran variables para poder referenciar los GUIDs generados
+-- en los movimientos/pagos posteriores.
+-- =========================================
+DECLARE @Card1 UNIQUEIDENTIFIER = NEWID(); -- Maria - saldo con uso moderado
+DECLARE @Card2 UNIQUEIDENTIFIER = NEWID(); -- Carlos - saldo alto, casi al límite
+DECLARE @Card3 UNIQUEIDENTIFIER = NEWID(); -- Ana - tarjeta nueva, sin uso
+DECLARE @Card4 UNIQUEIDENTIFIER = NEWID(); -- Comercial - tarjeta desactivada
+
+INSERT INTO CARDS (ID, ID_CLIENT, CARD_NUMBER, LASTD_CARD, ID_CARD_STATUS, CREDIT_LIMIT, AV_CREDIT, TOTAL_CREDIT, INTEREST, MIN_INTEREST)
+VALUES
+    (@Card1, '06121234567', '4000123456781234', '1234', 1, 2000.00, 1885.53, 114.47, 25.0, 5.0),
+    (@Card2, '06129876543', '4000123456785678', '5678', 1, 1500.00, 120.00, 1380.00, 20.0, 4.0),
+    (@Card3, '06135551212', '4000123456789012', '9012', 1, 3000.00, 3000.00, 0.00, 22.5, 5.0),
+    (@Card4, 'J061098765',  '4000123456780000', '0000', 2, 5000.00, 5000.00, 0.00, 18.0, 5.0);
+
+-- =========================================
+-- MOVIMIENTOS (COMPRAS) - MOVEMENTS_TC
+-- ID_STATE: 3 = Finished (procesada), 4 = Failed (rechazada)
+-- Incluye compras del mes actual y del mes anterior para
+-- poder validar el cálculo de "total compras mes actual vs anterior"
+-- =========================================
+
+-- Compras de @Card1 (Maria) - mes actual
+INSERT INTO MOVEMENTS_TC (MV_DATE, ID_CARD, AMOUNT, MV_DESCRIPTION, ID_STATE)
+VALUES
+    (DATEADD(DAY, -2, GETDATE()), @Card1, 45.99, 'Supermercado La Colonia', 3),
+    (DATEADD(DAY, -5, GETDATE()), @Card1, 68.48, 'Farmacia San Nicolas',     3),
+    (DATEADD(DAY, -1, GETDATE()), @Card1, 15.00, 'Suscripcion streaming',    3);
+
+-- Compras de @Card1 (Maria) - mes anterior
+INSERT INTO MOVEMENTS_TC (MV_DATE, ID_CARD, AMOUNT, MV_DESCRIPTION, ID_STATE)
+VALUES
+    (DATEADD(MONTH, -1, DATEADD(DAY, -3, GETDATE())), @Card1, 120.35, 'Compra ropa Simán', 3),
+    (DATEADD(MONTH, -1, DATEADD(DAY, -10, GETDATE())), @Card1, 34.10, 'Restaurante',       3);
+
+-- Compras de @Card2 (Carlos) - mes actual, incluye una rechazada por exceder disponible
+INSERT INTO MOVEMENTS_TC (MV_DATE, ID_CARD, AMOUNT, MV_DESCRIPTION, ID_STATE)
+VALUES
+    (DATEADD(DAY, -4, GETDATE()), @Card2, 300.00, 'Electrodomésticos',        3),
+    (DATEADD(DAY, -1, GETDATE()), @Card2, 500.00, 'Intento de compra rechazada', 4);
+
+-- Compras de @Card2 (Carlos) - mes anterior
+INSERT INTO MOVEMENTS_TC (MV_DATE, ID_CARD, AMOUNT, MV_DESCRIPTION, ID_STATE)
+VALUES
+    (DATEADD(MONTH, -1, DATEADD(DAY, -6, GETDATE())), @Card2, 250.00, 'Reparación vehículo', 3);
+
+-- @Card3 (Ana) no tiene movimientos - tarjeta nueva sin historial
+
+-- =========================================
+-- PAGOS - PAYMENTS_TC
+-- ID_STATE: 3 = Finished
+-- =========================================
+INSERT INTO PAYMENTS_TC (MV_DATE, ID_CARD, AMOUNT, MV_DESCRIPTION, ID_STATE)
+VALUES
+    (DATEADD(DAY, -7, GETDATE()), @Card1, 100.00, 'Pago mensual', 3),
+    (DATEADD(MONTH, -1, DATEADD(DAY, -15, GETDATE())), @Card2, 200.00, 'Pago parcial', 3);
+
+GO
