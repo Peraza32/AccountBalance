@@ -5,6 +5,7 @@
         public string clientId { get; set; }
         public string clientName { get; set; }
         public string cardNumber { get; set; } = string.Empty;
+        public Guid idCard { get; set; }
 
     }
 }

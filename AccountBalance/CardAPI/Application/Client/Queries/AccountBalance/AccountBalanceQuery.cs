@@ -5,8 +5,8 @@ using MediatR;
 
 namespace CardAPI.Application.Client.Queries.AccountBalance
 {
-    public record GetAccountBalance(string cardId) : IRequest<AccountBalanceDTO>;
-    public class AccountBalanceQueryHandler : IRequestHandler<GetAccountBalance, AccountBalanceDTO>
+    public record GetAccountBalance(Guid cardId, string userId) : IRequest<AccountBalanceResponseDTO>;
+    public class AccountBalanceQueryHandler : IRequestHandler<GetAccountBalance, AccountBalanceResponseDTO>
     {
         private readonly ICardRepository _cardRepository;
         private readonly IPurchaseRepository _purchaseRepository;
@@ -17,23 +17,27 @@ namespace CardAPI.Application.Client.Queries.AccountBalance
             _purchaseRepository = purchaseRepository;
             _logsRepository = logsRepository;
         }
-        public async Task<AccountBalanceDTO> Handle(GetAccountBalance request, CancellationToken cancellationToken)
+        public async Task<AccountBalanceResponseDTO> Handle(GetAccountBalance request, CancellationToken cancellationToken)
         {
             try
             {
 
-                var accountBalance = _cardRepository.GetCardBalanceAsync(Guid.Parse(request.cardId));
-                var actualMonthPurchases = _purchaseRepository.GetPurchasesCurrentMonthAsync(request.cardId);
+                var accountBalance =
+            await _cardRepository.GetCardBalanceAsync(request);
 
-                await Task.WhenAll(accountBalance, actualMonthPurchases);
-                var result = accountBalance.Result;
-                
-                if (accountBalance.Result == null)
+                if (accountBalance == null)
                 {
-                    throw new Exception("Account balance not found.");
+                    throw new KeyNotFoundException(
+                        "Account balance not found.");
                 }
-                result.purchases = actualMonthPurchases.Result;
-                return result;
+
+                var purchases =
+                    await _purchaseRepository.GetPurchasesCurrentMonthAsync(
+                        request.cardId.ToString());
+
+                accountBalance.purchases = purchases;
+
+                return accountBalance;
             }
             catch (Exception ex) 
             {

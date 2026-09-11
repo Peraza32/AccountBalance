@@ -1,4 +1,5 @@
-﻿using CardAPI.Domain.Entities.DTO;
+﻿using CardAPI.Application.Client.Queries.AccountBalance;
+using CardAPI.Domain.Entities.DTO;
 using CardAPI.Domain.Models;
 using CardAPI.Infrastructure.Persistance;
 using CardAPI.Infrastructure.Repositories.Interfaces;
@@ -23,16 +24,16 @@ namespace CardAPI.Infrastructure.Repositories
         {
             try
             {
-                var paymentIdParam = new SqlParameter("@ID_TARJETA", payment.IdCard);
+                var paymentCardParam = new SqlParameter("@ID_TARJETA", payment.IdCard);
                 var paymentAmountParam = new SqlParameter("@MONTO", payment.Amount);
                 var paymentDescriptionParam = new SqlParameter("@DESCRIPCION", payment.MvDescription);
                 var paymentDateParam = new SqlParameter("@FECHA", payment.MvDate);
-                var paymentCardParam = new SqlParameter("@PaymentId", System.Data.SqlDbType.Int)
+                var paymentIdParam = new SqlParameter("@PaymentId", System.Data.SqlDbType.Int)
                 { Direction = System.Data.ParameterDirection.Output };
 
                 var result = await _context.Database
                     .ExecuteSqlRawAsync("EXEC PROCESS_PAYMENT @ID_TARJETA, @MONTO, @DESCRIPCION, @FECHA, @PaymentId OUTPUT",
-                    paymentIdParam, paymentAmountParam, paymentDescriptionParam, paymentDateParam, paymentCardParam);
+                    paymentCardParam, paymentAmountParam, paymentDescriptionParam, paymentDateParam, paymentIdParam);
 
 
 
@@ -56,22 +57,29 @@ namespace CardAPI.Infrastructure.Repositories
             try
             {
                
-                var purchaseIdTarjetaParam = new SqlParameter("@PurchaseIdTarjeta", purchase.IdCard);
-                var purchaseAmountParam = new SqlParameter("@PurchaseAmount", purchase.Amount);
-                var purchaseDescriptionParam = new SqlParameter("@PurchaseDescription", purchase.MvDescription);
-                var purchaseDateParam = new SqlParameter("@PurchaseDate", purchase.MvDate);
+                var purchaseIdTarjetaParam = new SqlParameter("@ID_TARJETA", purchase.IdCard);
+                var purchaseAmountParam = new SqlParameter("@MONTO", purchase.Amount);
+                var purchaseDescriptionParam = new SqlParameter("@DESCRIPCION", purchase.MvDescription);
+                var purchaseDateParam = new SqlParameter("@FECHA", purchase.MvDate);
                 var purchaseOutStateParam = new SqlParameter("@Status", System.Data.SqlDbType.Int) { Direction = System.Data.ParameterDirection.Output };
                 var purchaseIdOutParam = new SqlParameter("@PurchaseId", System.Data.SqlDbType.Int) { Direction = System.Data.ParameterDirection.Output };
 
 
-                var result = await _context.PurchaseResults
-                    .FromSqlRaw("EXEC PROCESS_PURCHASE @PurchaseIdTarjeta," +
-                    " @PurchaseAmount, @PurchaseDescription, @PurchaseDate, @Status OUTPUT," +
+                await _context.Database
+                    .ExecuteSqlRawAsync("EXEC PROCESS_PURCHASE @ID_TARJETA," +
+                    " @MONTO, @DESCRIPCION, @FECHA, @Status OUTPUT," +
                     " @PurchaseId OUTPUT", purchaseIdTarjetaParam, purchaseAmountParam, purchaseDescriptionParam, 
                     purchaseDateParam, purchaseOutStateParam, purchaseIdOutParam)
-                    .ToListAsync();
+                    ;
 
-                return result.FirstOrDefault();
+
+                var result = new NewPurchaseResultDTO
+                {
+                    purchaseId = (int)purchaseIdOutParam.Value,
+                    Status = (int)purchaseOutStateParam.Value
+                };
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -86,13 +94,14 @@ namespace CardAPI.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<AccountBalanceDTO> GetCardBalanceAsync(Guid cardId)
+        public async Task<AccountBalanceResponseDTO> GetCardBalanceAsync(GetAccountBalance request)
         {
             try
             {
-                var cardIdParam = new SqlParameter("@ID_TARJETA", cardId);
+                var cardIdParam = new SqlParameter("@ID_TARJETA", request.cardId);
+                var userIdParam = new SqlParameter("@ID_CLIENTE", request.userId);
                 var result = await _context.AccountBalances
-                    .FromSqlRaw("EXEC GET_ACCOUNT_BALANCE @ID_TARJETA", cardIdParam)
+                    .FromSqlRaw("EXEC GET_ACCOUNT_BALANCE @ID_TARJETA, @ID_CLIENTE", cardIdParam, userIdParam)
                     .ToListAsync();
 
 

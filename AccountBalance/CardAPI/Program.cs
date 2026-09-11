@@ -20,6 +20,7 @@ builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 //Automapper 
 builder.Services.AddAutoMapper(typeof(PurchaseProfile));
 builder.Services.AddAutoMapper(typeof(PaymentProfile));
+builder.Services.AddAutoMapper(typeof(ClientProfile));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

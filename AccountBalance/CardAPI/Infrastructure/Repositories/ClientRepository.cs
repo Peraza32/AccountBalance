@@ -15,15 +15,15 @@ namespace CardAPI.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<List<UserWithCardsDTO>> GetUserAndCards(string user)
+        public async Task<UserWithCardsDTO> GetUserAndCard(string user)
         {
             var clientIdParam = new SqlParameter("@CLIENT", user);
-            var result = await _context.UserWithCardsDTO
-                .FromSqlInterpolated($"EXEC GetUserAndCards @CLIENT={clientIdParam}")
+            var result = await _context.UserWithCards
+                .FromSqlInterpolated($"EXEC GET_CLIENTWITHCARDS @CLIENT={clientIdParam}")
                 .AsNoTracking()
                 .ToListAsync();
 
-            return result;
+            return result.FirstOrDefault();
         }
 
         public async Task<List<PurchaseDTO>> GetUserPurchases(int userId, Guid cardId)

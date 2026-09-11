@@ -27,7 +27,6 @@
   <ItemGroup>
     <Folder Include="Application\Card\Queries\" />
     <Folder Include="Application\Client\Commands\" />
-    <Folder Include="Domain\Entities\DAO\" />
   </ItemGroup>
 
 </Project>
