@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using CardAPI.Application.Client.Queries.AccountBalance;
 using CardAPI.Application.Client.Queries.ClientData;
+using CardAPI.Application.Client.TransactionHistory;
 using CardAPI.Domain.Entities.DAO;
+using CardAPI.Domain.Entities.DTO;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -34,11 +36,23 @@ namespace CardAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("Cliente/{userId}")]
+        [HttpGet("{userId}")]
         public async Task<IActionResult> GetClientData(string userId)
         {
-            
+
             var result = await _mediator.Send(new ClientData(userId));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
+        [HttpPost("TransactionHistory")]
+        public async Task<IActionResult> GetTransactionHistory([FromBody] TransactionHistoryRequestDTO request)
+        {
+            
+            var result = await _mediator.Send(new GetTransactionHistory(request.CardId, request.UserId));
             if (result == null)
             {
                 return NotFound();

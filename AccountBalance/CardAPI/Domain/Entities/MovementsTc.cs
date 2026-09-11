@@ -10,7 +10,7 @@ namespace CardAPI.Domain.Models
         public Guid IdCard { get; set; }
         public decimal Amount { get; set; }
         public string MvDescription { get; set; }
-        public int IdState { get; set; } = 0;
+        public int IdState { get; set; } = 1;
 
         public virtual Card IdCardNavigation { get; set; }
         public virtual TransactionState IdStateNavigation { get; set; }

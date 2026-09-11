@@ -78,10 +78,6 @@ namespace CardAPI.Controllers
             }
         }
 
-        // DELETE api/<CardController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+       
     }
 }
