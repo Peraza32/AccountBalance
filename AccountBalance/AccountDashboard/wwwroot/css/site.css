@@ -1,18 +1,474 @@
-html {
-  font-size: 14px;
+
+
+:root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --primary: #D9272E;
+    --primary-600: ##BF181F;
+    --accent: #b0182e;
+    --accent-600: #8f1224;
+    --text: #1a2233;
+    --text-muted: #5b6472;
+    --border: #e2e5ea;
+    --success: #1f7a4d;
+    --success-bg: #eaf5ef;
+    --danger-bg: #fbe9eb;
+    --radius: 6px;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 16px;
+    --space-4: 24px;
+    --space-5: 32px;
+    --space-6: 48px;
 }
 
-@media (min-width: 768px) {
-  html {
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
     font-size: 16px;
-  }
+    line-height: 1.5;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+a {
+    color: var(--primary-600);
 }
 
-body {
-  margin-bottom: 60px;
+    a:hover {
+        color: var(--accent);
+    }
+
+/* ---------- Layout shell ---------- */
+
+.app-header {
+    background: var(--primary);
+    border-bottom: 1px solid var(--primary-600);
+}
+
+.app-header__inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.brand {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: 0.2px;
+}
+
+    .brand:hover {
+        color: #ffffff;
+        opacity: 0.9;
+    }
+
+.app-nav {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+    .app-nav a {
+        color: #cdd6e4;
+        text-decoration: none;
+        font-size: 0.92rem;
+        font-weight: 500;
+        padding: var(--space-1) 0;
+        border-bottom: 2px solid transparent;
+    }
+
+        .app-nav a:hover,
+        .app-nav a.active {
+            color: #ffffff;
+            border-bottom-color: var(--accent);
+        }
+
+.app-main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--space-5) var(--space-4) var(--space-6);
+}
+
+.app-footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    padding: var(--space-4);
+}
+
+/* ---------- Page heading ---------- */
+
+.page-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+    .page-header h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .page-header .subtitle {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+    }
+
+/* ---------- Cards ---------- */
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+    .card h2 {
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin: 0 0 var(--space-3);
+    }
+
+.card--tight {
+    padding: var(--space-3);
+}
+
+/* ---------- Summary metrics (the hero content) ---------- */
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+}
+
+.metric {
+    padding: var(--space-3) 0;
+}
+
+    .metric .metric-label {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-bottom: var(--space-1);
+    }
+
+    .metric .metric-value {
+        font-size: 1.6rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.3px;
+    }
+
+        .metric .metric-value.is-negative {
+            color: var(--accent);
+        }
+
+        .metric .metric-value.is-positive {
+            color: var(--success);
+        }
+
+.metric-hero .metric-value {
+    font-size: 2.1rem;
+}
+
+/* Inline money used in tables/paragraphs */
+.money {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ---------- Cardholder identity strip ---------- */
+
+.holder-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding-bottom: var(--space-3);
+    margin-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border);
+}
+
+    .holder-strip .holder-name {
+        font-size: 1.15rem;
+        font-weight: 600;
+    }
+
+    .holder-strip .card-number {
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
+        font-size: 0.95rem;
+    }
+
+/* ---------- Tables ---------- */
+
+table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+}
+
+.data-table th {
+    text-align: left;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: var(--space-2) var(--space-2);
+    border-bottom: 1px solid var(--border);
+}
+
+.data-table td {
+    padding: var(--space-2) var(--space-2);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+}
+
+    .data-table td.amount,
+    .data-table th.amount {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.empty-state {
+    color: var(--text-muted);
+    padding: var(--space-4);
+    text-align: center;
+    font-size: 0.92rem;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    font-size: 0.92rem;
+    font-weight: 600;
+    padding: 10px 18px;
+    cursor: pointer;
+    text-decoration: none;
+    line-height: 1.2;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+    .btn-primary:hover {
+        background: var(--primary-600);
+        color: #ffffff;
+    }
+
+.btn-accent {
+    background: var(--accent);
+    color: #ffffff;
+}
+
+    .btn-accent:hover {
+        background: var(--accent-600);
+        color: #ffffff;
+    }
+
+.btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+    .btn-secondary:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-row {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-top: var(--space-4);
+}
+
+/* ---------- Forms ---------- */
+
+.form-group {
+    margin-bottom: var(--space-4);
+}
+
+    .form-group label {
+        display: block;
+        font-size: 0.88rem;
+        font-weight: 600;
+        margin-bottom: var(--space-2);
+    }
+
+.form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--surface);
+}
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(18, 35, 63, 0.12);
+    }
+
+.field-hint {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-top: var(--space-1);
+}
+
+.field-error,
+.text-danger {
+    color: var(--accent);
+    font-size: 0.82rem;
+    margin-top: var(--space-1);
+}
+
+.validation-summary {
+    background: var(--danger-bg);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    color: var(--accent-600);
+    padding: var(--space-3);
+    margin-bottom: var(--space-4);
+    font-size: 0.9rem;
+}
+
+    .validation-summary ul {
+        margin: var(--space-1) 0 0 var(--space-4);
+        padding: 0;
+    }
+
+/* ---------- Alerts / confirmations ---------- */
+
+.alert {
+    border-radius: var(--radius);
+    padding: var(--space-3);
+    margin-bottom: var(--space-4);
+    font-size: 0.92rem;
+    border: 1px solid transparent;
+}
+
+.alert-success {
+    background: var(--success-bg);
+    border-color: var(--success);
+    color: #145436;
+}
+
+.alert-error {
+    background: var(--danger-bg);
+    border-color: var(--accent);
+    color: var(--accent-600);
+}
+
+/* ---------- Badges (transaction type / state) ---------- */
+
+.badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+}
+
+.badge-purchase {
+    color: var(--accent-600);
+    border-color: var(--accent);
+    background: var(--danger-bg);
+}
+
+.badge-payment {
+    color: var(--success);
+    border-color: var(--success);
+    background: var(--success-bg);
+}
+
+/* ---------- Utility ---------- */
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+.mt-0 {
+    margin-top: 0;
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+    .app-header__inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+    }
+
+    .metric-hero .metric-value {
+        font-size: 1.7rem;
+    }
+}
+
+/* ---------- Print (used by the "Exportar en PDF" flow) ---------- */
+
+@media print {
+    .app-header, .app-nav, .app-footer, .btn-row, .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: #ffffff;
+    }
+
+    .app-main {
+        max-width: none;
+        padding: 0;
+    }
+
+    .card {
+        border: none;
+        padding: 0;
+        margin-bottom: var(--space-4);
+    }
 }

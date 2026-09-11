@@ -48,6 +48,18 @@ namespace CardAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet("username/{userName}")]
+        public async Task<IActionResult> GetClientDataByName(string userName)
+        {
+
+            var result = await _mediator.Send(new ClientDataByName(userName));
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
         [HttpPost("TransactionHistory")]
         public async Task<IActionResult> GetTransactionHistory([FromBody] TransactionHistoryRequestDTO request)
         {

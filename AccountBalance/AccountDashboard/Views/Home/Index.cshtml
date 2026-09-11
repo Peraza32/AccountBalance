@@ -1,11 +1,12 @@
-﻿@model CardLookupViewModel
+﻿
+@model CardLookupViewModel
 @{
     ViewData["Title"] = "Inicio";
 }
 
 <div class="page-header">
     <h1>Consultar estado de cuenta</h1>
-    <span class="subtitle">Ingresa el identificador de la tarjeta para continuar</span>
+    <span class="subtitle">Ingresa el número del documento del cliente para continuar</span>
 </div>
 
 <div class="card" style="max-width: 480px;">
@@ -14,10 +15,10 @@
         <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
 
         <div class="form-group">
-            <label asp-for="CardId"></label>
-            <input asp-for="CardId" class="form-control" placeholder="00000000-0000-0000-0000-000000000000" />
-            <span asp-validation-for="CardId" class="field-error"></span>
-            <div class="field-hint">Es el identificador (GUID) de la tarjeta en CARDS.ID.</div>
+            <label asp-for="docNumber"></label>
+            <input asp-for="docNumber" class="form-control" placeholder="123456789" />
+            <span asp-validation-for="docNumber" class="field-error"></span>
+            <div class="field-hint">Ingrese un DUI o NIT.</div>
         </div>
 
         <div class="btn-row">

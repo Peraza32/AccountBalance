@@ -79,5 +79,16 @@ namespace CardAPI.Infrastructure.Repositories
 
             return result;
         }
+
+        public async Task<UserWithCardsDTO> GetUserByName(string userName)
+        {
+            var clientIdParam = new SqlParameter("@CLIENT_NAMET", userName);
+            var result = await _context.UserWithCards
+                .FromSqlInterpolated($"EXEC GET_CLIENTWITHCARDSBYNAME @CLIENT_NAME={clientIdParam}")
+                .AsNoTracking()
+                .ToListAsync();
+
+            return result.FirstOrDefault();
+        }
     }
 }
